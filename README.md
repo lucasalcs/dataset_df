@@ -81,8 +81,6 @@ This project builds upon the work from the [SSL_Anti-spoofing](https://github.co
 
 **Note:** Make sure to update any file paths (e.g., where your audio files are located) in the notebook if needed.
 
-## Project Structure
-
 ## Citation
 
 If you use this work in your research, please cite the original paper:
