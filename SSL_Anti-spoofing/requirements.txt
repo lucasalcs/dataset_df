@@ -1,0 +1,8 @@
+# This should match the original repository's requirements
+tensorboard==2.11.2
+tqdm==4.67.1
+gdown==5.2.0
+numpy==1.21.6
+jupyterlab==3.6.8
+matplotlib==3.5.3
+markupsafe==2.0.1
