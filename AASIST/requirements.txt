@@ -1,0 +1,18 @@
+# Core requirements from original repo
+tqdm>=4.48.0
+matplotlib>=3.3.0
+soundfile>=0.10.3
+numpy>=1.19.0
+
+# Jupyter with specific versions known to work together
+jupyter>=1.0.0
+ipython>=7.16.1
+ipykernel>=6.0.0
+notebook>=6.4.0
+
+# Pinned versions to fix compatibility issues
+markupsafe==2.0.1
+jinja2==3.0.3
+
+# Additional dependencies required by the model
+tensorboard>=2.3.0

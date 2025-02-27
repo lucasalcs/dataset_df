@@ -1,40 +1,59 @@
 # Deepfake Detection Models (df_models)
 
-This repository provides tools and a deep learning model for detecting deepfake audio samples (anti-spoofing). It includes an end-to-end inference pipeline, sample notebooks for inference on custom WAV files, and a Docker container for easy deployment.
+This repository provides tools and deep learning models for detecting deepfake audio samples (anti-spoofing). It includes end-to-end inference pipelines, sample notebooks for inference on custom WAV files, and Docker containers for easy deployment of two state-of-the-art deepfake detection systems: SSL_Anti-spoofing and AASIST.
 
 ## Overview
 
 The repository includes:
 
-- **Inference Notebook**:  
-  `SSL_Anti-spoofing/notebooks/SSL-inference.ipynb` provides step-by-step instructions for:
-  - Loading and pre-processing your audio files.
-  - Running batch inference using a pretrained deepfake (DF) detection model.
-  - Visualizing the distribution of detection scores with threshold annotations.
+- **SSL_Anti-spoofing Model**:
+  - **Inference Notebook**:  
+    `SSL_Anti-spoofing/notebooks/SSL-inference.ipynb` provides step-by-step instructions for:
+    - Loading and pre-processing your audio files.
+    - Running batch inference using a pretrained deepfake (DF) detection model.
+    - Visualizing the distribution of detection scores with threshold annotations.
 
-- **Docker Container**:  
-  `SSL_Anti-spoofing/Dockerfile` builds a containerized environment with:
-  - A PyTorch runtime image.
-  - All necessary system dependencies and Python libraries.
-  - Automatic downloads of the pretrained model (Best_LA_model_for_DF.pth) and XLS-R wav2vec model.
-  - A pre-configured Jupyter Lab server ready to launch on container startup.
+  - **Docker Container**:  
+    `SSL_Anti-spoofing/Dockerfile` builds a containerized environment with:
+    - A PyTorch runtime image.
+    - All necessary system dependencies and Python libraries.
+    - Automatic downloads of the pretrained model (Best_LA_model_for_DF.pth) and XLS-R wav2vec model.
+    - A pre-configured Jupyter Lab server ready to launch on container startup.
+
+- **AASIST Model**:
+  - **Inference Notebook**:  
+    `AASIST/notebooks/AASIST-inference.ipynb` offers similar capabilities for the AASIST model:
+    - Processing audio files using AASIST's graph attention networks.
+    - Running inference with pre-trained models.
+    - Visualizing results with the EER threshold.
+
+  - **Docker Container**:  
+    `AASIST/Dockerfile` provides a ready-to-use environment with:
+    - A PyTorch 1.6.0 runtime image with CUDA 10.1 support.
+    - The complete AASIST codebase and dependencies.
+    - Pre-trained AASIST and AASIST-L models.
+    - A Jupyter Lab interface for running the notebook.
 
 - **Python Requirements**:  
-  `SSL_Anti-spoofing/requirements.txt` lists the essential dependencies for running the project.
+  Each model folder contains its own `requirements.txt` file listing the essential dependencies.
 
 ## Features
 
-- **Pretrained DF Detection Model**: Uses a model (downloaded automatically in Docker) for anti-spoofing inference.
-- **Custom Audio Dataset**: Supports recursive loading and pre-processing of WAV files.
+- **Multiple Detection Models**: 
+  - **SSL_Anti-spoofing**: Uses self-supervised learning with wav2vec 2.0 for anti-spoofing.
+  - **AASIST**: Uses integrated spectro-temporal graph attention networks.
+- **Custom Audio Dataset**: Supports recursive loading and pre-processing of WAV/FLAC files.
 - **Batch Inference & Continuous Saving**: Processes large datasets in batches, saving results after each inference step.
-- **Visualization Tools**: Histograms with threshold lines to help interpret DF detection scores.
-- **Dockerized Setup**: Quickly set up the environment using Docker to avoid dependency issues.
+- **Visualization Tools**: Histograms with threshold lines to help interpret detection scores.
+- **Dockerized Setup**: Quickly set up each environment using Docker to avoid dependency issues.
 
 ## Acknowledgements
 
-This project builds upon the work from the [SSL_Anti-spoofing](https://github.com/TakHemlata/SSL_Anti-spoofing) repository by TakHemlata et al., which implements the core deepfake detection model described in their paper:
+This project builds upon the work from two repositories:
 
-> "Automatic speaker verification spoofing and deepfake detection using wav2vec 2.0 and data augmentation" (Speaker Odyssey 2022 Workshop)
+1. [SSL_Anti-spoofing](https://github.com/TakHemlata/SSL_Anti-spoofing) by TakHemlata et al., which implements a deepfake detection model using wav2vec 2.0.
+
+2. [AASIST](https://github.com/clovaai/aasist) by NAVER Corporation, which implements audio anti-spoofing using integrated spectro-temporal graph attention networks.
 
 ## Getting Started
 
@@ -45,12 +64,16 @@ This project builds upon the work from the [SSL_Anti-spoofing](https://github.co
 
 ### Docker Setup
 
-1. **Build the Docker Image**
+1. **Build the Docker Images**
 
-   From the repository root, run:
+   From the repository root, run one of the following to build your preferred model:
 
    ```bash
+   # For SSL_Anti-spoofing
    docker build -f SSL_Anti-spoofing/Dockerfile -t ssl-antispoof .
+   
+   # For AASIST
+   docker build -f AASIST/Dockerfile -t aasist .
    ```
 
 2. **Run the Container**
@@ -58,24 +81,23 @@ This project builds upon the work from the [SSL_Anti-spoofing](https://github.co
    Launch the container exposing port 8888 for Jupyter Lab:
 
    ```bash
-   sudo docker run -p 8888:8888 ssl-antispoof
+   # For SSL_Anti-spoofing
+   docker run -p 8888:8888 ssl-antispoof
+   
+   # For AASIST
+   docker run -p 8888:8888 aasist
    ```
 
    This command starts Jupyter Lab. Open the provided URL in your browser to interact with the notebook.
 
+### Using the Notebooks
 
-1. Start Jupyter Lab from your Docker container (or local environment):
-
-   ```bash
-   jupyter lab
-   ```
-
-2. Open `SSL_Anti-spoofing/notebooks/SSL-inference.ipynb`.
-
+1. Start Jupyter Lab from your Docker container (or local environment)
+2. Open either `SSL_Anti-spoofing/notebooks/SSL-inference.ipynb` or `AASIST/notebooks/AASIST-inference.ipynb`
 3. Follow the notebook cells which will:
-   - Generate a list of WAV files (or load them from a text file).
+   - Generate a list of audio files (or load them from a text file).
    - Define the custom dataset and loader.
-   - Load the pretrained DF detection model.
+   - Load the pretrained detection model.
    - Process audio files in batches and save the detection scores.
    - Visualize the score distribution.
 
@@ -83,8 +105,9 @@ This project builds upon the work from the [SSL_Anti-spoofing](https://github.co
 
 ## Citation
 
-If you use this work in your research, please cite the original paper:
+If you use this work in your research, please cite the original papers:
 
+For SSL_Anti-spoofing:
 ```bibtex
 @inproceedings{tak2022automatic,
   title={Automatic speaker verification spoofing and deepfake detection using wav2vec 2.0 and data augmentation},
@@ -94,9 +117,20 @@ If you use this work in your research, please cite the original paper:
 }
 ```
 
-The original implementation can be found at:  
-[https://github.com/TakHemlata/SSL_Anti-spoofing](https://github.com/TakHemlata/SSL_Anti-spoofing)
+For AASIST:
+```bibtex
+@INPROCEEDINGS{Jung2021AASIST,
+  author={Jung, Jee-weon and Heo, Hee-Soo and Tak, Hemlata and Shim, Hye-jin and Chung, Joon Son and Lee, Bong-Jin and Yu, Ha-Jin and Evans, Nicholas},
+  booktitle={IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 
+  title={AASIST: Audio Anti-Spoofing using Integrated Spectro-Temporal Graph Attention Networks}, 
+  year={2022}
+}
+```
+
+The original implementations can be found at:  
+- SSL_Anti-spoofing: [https://github.com/TakHemlata/SSL_Anti-spoofing](https://github.com/TakHemlata/SSL_Anti-spoofing)
+- AASIST: [https://github.com/clovaai/aasist](https://github.com/clovaai/aasist)
 
 ## License
 
-This project is MIT licensed, following the original repository's license.
+This project is MIT licensed, following the original repositories' licenses.
