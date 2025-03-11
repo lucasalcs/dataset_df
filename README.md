@@ -1,6 +1,6 @@
 # Deepfake Detection Models (df_models)
 
-This repository provides tools and deep learning models for detecting deepfake audio samples (anti-spoofing). It includes end-to-end inference pipelines, sample notebooks for inference on custom WAV files, and Docker containers for easy deployment of two state-of-the-art deepfake detection systems: SSL_Anti-spoofing and AASIST.
+This repository provides tools and deep learning models for detecting deepfake audio samples (anti-spoofing). It includes end-to-end inference pipelines, sample notebooks for inference on custom WAV files, and Docker containers for easy deployment of three state-of-the-art deepfake detection systems: SSL_Anti-spoofing, AASIST, and SLSforASVspoof.
 
 ## Overview
 
@@ -34,6 +34,20 @@ The repository includes:
     - Pre-trained AASIST and AASIST-L models.
     - A Jupyter Lab interface for running the notebook.
 
+- **SLSforASVspoof Model**:
+  - **Inference Notebook**:  
+    `SLSforASVspoof/notebooks/SLS-inference.ipynb` provides capabilities for the SLS model:
+    - Processing audio files using Supervised Label Smoothing approach.
+    - Running inference with the pre-trained model for deepfake detection.
+    - Visualizing detection scores with threshold annotations.
+
+  - **Docker Container**:  
+    `SLSforASVspoof/Dockerfile` builds an environment with:
+    - A PyTorch 1.12.1 runtime image with CUDA 11.3 support.
+    - All required dependencies for the SLS model.
+    - Pre-trained model weights from the ASVspoof 2021-DF challenge.
+    - A Jupyter Lab interface for running the notebook.
+
 - **Python Requirements**:  
   Each model folder contains its own `requirements.txt` file listing the essential dependencies.
 
@@ -42,6 +56,7 @@ The repository includes:
 - **Multiple Detection Models**: 
   - **SSL_Anti-spoofing**: Uses self-supervised learning with wav2vec 2.0 for anti-spoofing.
   - **AASIST**: Uses integrated spectro-temporal graph attention networks.
+  - **SLSforASVspoof**: Uses supervised label smoothing approach for deepfake detection.
 - **Custom Audio Dataset**: Supports recursive loading and pre-processing of WAV/FLAC files.
 - **Batch Inference & Continuous Saving**: Processes large datasets in batches, saving results after each inference step.
 - **Visualization Tools**: Histograms with threshold lines to help interpret detection scores.
@@ -49,11 +64,13 @@ The repository includes:
 
 ## Acknowledgements
 
-This project builds upon the work from two repositories:
+This project builds upon the work from three repositories:
 
 1. [SSL_Anti-spoofing](https://github.com/TakHemlata/SSL_Anti-spoofing) by TakHemlata et al., which implements a deepfake detection model using wav2vec 2.0.
 
 2. [AASIST](https://github.com/clovaai/aasist) by NAVER Corporation, which implements audio anti-spoofing using integrated spectro-temporal graph attention networks.
+
+3. [SLSforASVspoof-2021-DF](https://github.com/QiShanZhang/SLSforASVspoof-2021-DF) by QiShan Zhang et al., which uses supervised label smoothing for deepfake detection.
 
 ## Getting Started
 
@@ -66,14 +83,29 @@ This project builds upon the work from two repositories:
 
 1. **Build the Docker Images**
 
-   From the repository root, run one of the following to build your preferred model:
+   Navigate to each model's directory and build the Docker image:
 
    ```bash
    # For SSL_Anti-spoofing
-   docker build -f SSL_Anti-spoofing/Dockerfile -t ssl-antispoof .
+   cd SSL_Anti-spoofing
+   docker build -t ssl-antispoof .
    
    # For AASIST
-   docker build -f AASIST/Dockerfile -t aasist .
+   cd AASIST
+   docker build -t aasist .
+   
+   # For SLSforASVspoof
+   cd SLSforASVspoof
+   docker build -t sls-df .
+   ```
+
+   Alternatively, to build without changing directories, specify full paths:
+   
+   ```bash
+   # From repository root
+   docker build -f SSL_Anti-spoofing/Dockerfile -t ssl-antispoof SSL_Anti-spoofing
+   docker build -f AASIST/Dockerfile -t aasist AASIST
+   docker build -f SLSforASVspoof/Dockerfile -t sls-df SLSforASVspoof
    ```
 
 2. **Run the Container**
@@ -86,14 +118,45 @@ This project builds upon the work from two repositories:
    
    # For AASIST
    docker run -p 8888:8888 aasist
+   
+   # For SLSforASVspoof
+   docker run -p 8888:8888 sls-df
    ```
 
+   **Run with GPU support (recommended for faster inference):**
+   
+   ```bash
+   # For SSL_Anti-spoofing with GPU
+   docker run --gpus all -p 8888:8888 ssl-antispoof
+   
+   # For AASIST with GPU
+   docker run --gpus all -p 8888:8888 aasist
+   
+   # For SLSforASVspoof with GPU
+   docker run --gpus all -p 8888:8888 sls-df
+   ```
+
+   Note: To use GPU acceleration, you must have the [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker) installed on your host system.
+
    This command starts Jupyter Lab. Open the provided URL in your browser to interact with the notebook.
+
+3. **Mount Data Directories**
+
+   To analyze your own audio files, mount your data directory to the container:
+
+   ```bash
+   docker run --gpus all -p 8888:8888 -v /path/to/your/audio/files:/data/audio_files sls-df
+   ```
+
+   Then in the notebook, use `/data/audio_files` as the input directory path.
 
 ### Using the Notebooks
 
 1. Start Jupyter Lab from your Docker container (or local environment)
-2. Open either `SSL_Anti-spoofing/notebooks/SSL-inference.ipynb` or `AASIST/notebooks/AASIST-inference.ipynb`
+2. Open one of the following notebooks:
+   - `SSL_Anti-spoofing/notebooks/SSL-inference.ipynb`  
+   - `AASIST/notebooks/AASIST-inference.ipynb`
+   - `SLSforASVspoof/notebooks/SLS-inference.ipynb`
 3. Follow the notebook cells which will:
    - Generate a list of audio files (or load them from a text file).
    - Define the custom dataset and loader.
@@ -127,9 +190,22 @@ For AASIST:
 }
 ```
 
+For SLSforASVspoof:
+```bibtex
+@inproceedings{zhang2021one,
+  title={One-class learning towards generalized voice spoofing detection},
+  author={Zhang, Qi-Shan and Wang, Hong and Tao, Jian-Hua},
+  booktitle={2021 12th International Symposium on Chinese Spoken Language Processing (ISCSLP)},
+  pages={1--5},
+  year={2021},
+  organization={IEEE}
+}
+```
+
 The original implementations can be found at:  
 - SSL_Anti-spoofing: [https://github.com/TakHemlata/SSL_Anti-spoofing](https://github.com/TakHemlata/SSL_Anti-spoofing)
 - AASIST: [https://github.com/clovaai/aasist](https://github.com/clovaai/aasist)
+- SLSforASVspoof: [https://github.com/QiShanZhang/SLSforASVspoof-2021-DF](https://github.com/QiShanZhang/SLSforASVspoof-2021-DF)
 
 ## License
 
