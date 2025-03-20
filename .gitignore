@@ -169,3 +169,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+files/eval_asvspoof_new_scores.txt
+files/sls_scores.pkl
+files/trial_metadata.txt
