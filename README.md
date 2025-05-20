@@ -1,3 +1,10 @@
+# BRSpeech-DF: A Deep Fake Synthetic Speech Dataset for Portuguese Zero-Shot TTS
+
+The link to download the dataset will be available soon.
+
+Preview of dataset: https://speechdeveloper.github.io/
+
+
 # Deepfake Detection Models (df_models)
 
 This repository provides tools and deep learning models for detecting deepfake audio samples (anti-spoofing). It includes end-to-end inference pipelines, sample notebooks for inference on custom WAV files, and Docker containers for easy deployment of four state-of-the-art deepfake detection systems: SSL_Anti-spoofing, AASIST, SLS, and XLSR-Mamba.
