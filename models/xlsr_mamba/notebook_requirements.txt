@@ -1,0 +1,9 @@
+# Jupyter environment and common analysis/plotting tools
+jupyterlab>=3.0.0
+ipykernel>=6.0.0
+ipywidgets>=7.0.0 # For interactive tqdm progress bars
+pandas>=1.3.0  # For data manipulation/analysis if needed
+matplotlib>=3.4.0 # For plotting
+seaborn>=0.11.0 # For enhanced plotting
+scikit-learn>=1.0.0 # For metrics like EER, etc.
+tqdm>=4.60.0 # Progress bars 

@@ -1,6 +1,6 @@
 # Deepfake Detection Models (df_models)
 
-This repository provides tools and deep learning models for detecting deepfake audio samples (anti-spoofing). It includes end-to-end inference pipelines, sample notebooks for inference on custom WAV files, and Docker containers for easy deployment of three state-of-the-art deepfake detection systems: SSL_Anti-spoofing, AASIST, and SLSforASVspoof.
+This repository provides tools and deep learning models for detecting deepfake audio samples (anti-spoofing). It includes end-to-end inference pipelines, sample notebooks for inference on custom WAV files, and Docker containers for easy deployment of four state-of-the-art deepfake detection systems: SSL_Anti-spoofing, AASIST, SLS, and XLSR-Mamba.
 
 ## Overview
 
@@ -8,13 +8,13 @@ The repository includes:
 
 - **SSL_Anti-spoofing Model**:
   - **Inference Notebook**:  
-    `SSL_Anti-spoofing/notebooks/SSL-inference.ipynb` provides step-by-step instructions for:
+    `models/ssl_antispoof/notebooks/SSL-inference.ipynb` provides step-by-step instructions for:
     - Loading and pre-processing your audio files.
     - Running batch inference using a pretrained deepfake (DF) detection model.
     - Visualizing the distribution of detection scores with threshold annotations.
 
   - **Docker Container**:  
-    `SSL_Anti-spoofing/Dockerfile` builds a containerized environment with:
+    `models/ssl_antispoof/Dockerfile` builds a containerized environment with:
     - A PyTorch runtime image.
     - All necessary system dependencies and Python libraries.
     - Automatic downloads of the pretrained model (Best_LA_model_for_DF.pth) and XLS-R wav2vec model.
@@ -22,34 +22,47 @@ The repository includes:
 
 - **AASIST Model**:
   - **Inference Notebook**:  
-    `AASIST/notebooks/AASIST-inference.ipynb` offers similar capabilities for the AASIST model:
+    `models/aasist/notebooks/AASIST-inference.ipynb` offers similar capabilities for the AASIST model:
     - Processing audio files using AASIST's graph attention networks.
     - Running inference with pre-trained models.
     - Visualizing results with the EER threshold.
 
   - **Docker Container**:  
-    `AASIST/Dockerfile` provides a ready-to-use environment with:
+    `models/aasist/Dockerfile` provides a ready-to-use environment with:
     - A PyTorch 1.6.0 runtime image with CUDA 10.1 support.
     - The complete AASIST codebase and dependencies.
     - Pre-trained AASIST and AASIST-L models.
     - A Jupyter Lab interface for running the notebook.
 
-- **SLSforASVspoof Model**:
+- **SLS Model**:
   - **Inference Notebook**:  
-    `SLSforASVspoof/notebooks/SLS-inference.ipynb` provides capabilities for the SLS model:
+    `models/sls/notebooks/SLS-inference.ipynb` provides capabilities for the SLS model:
     - Processing audio files using Supervised Label Smoothing approach.
     - Running inference with the pre-trained model for deepfake detection.
     - Visualizing detection scores with threshold annotations.
 
   - **Docker Container**:  
-    `SLSforASVspoof/Dockerfile` builds an environment with:
+    `models/sls/Dockerfile` builds an environment with:
     - A PyTorch 1.12.1 runtime image with CUDA 11.3 support.
     - All required dependencies for the SLS model.
     - Pre-trained model weights from the ASVspoof 2021-DF challenge.
     - A Jupyter Lab interface for running the notebook.
 
+- **XLSR-Mamba Model**:
+  - **Description**: Utilizes a dual-column bidirectional state space model combined with self-supervised learning (pre-trained wav2vec 2.0) for spoofing attack detection.
+  - **Docker Container**:
+    `models/xlsr_mamba/Dockerfile` builds a containerized environment that:
+    - Clones the XLSR-Mamba repository (`https://github.com/swagshaw/XLSR-Mamba.git`).
+    - Installs dependencies including a specific commit of `fairseq`.
+    - Sets up a Jupyter Lab server.
+  - **Inference Notebook**:
+    An inference notebook may be available within the cloned XLSR-Mamba repository or may need to be adapted/created based on the examples provided in that repository.
+  - **Requirements**:
+    The primary dependencies are managed within the `Dockerfile`, which installs requirements from the cloned XLSR-Mamba repository and an additional `models/xlsr_mamba/requirements.txt` (if present and copied as `external_requirements.txt`).
+  - **Status**: The integration of this model is currently in progress and not yet fully implemented or tested within this project.
+
 - **Python Requirements**:  
-  Each model folder contains its own `requirements.txt` file listing the essential dependencies.
+  Each model folder (`models/ssl_antispoof`, `models/aasist`, `models/sls`, and potentially `models/xlsr_mamba`) contains its own `requirements.txt` file listing the essential dependencies (or they are handled within the Dockerfile, as with XLSR-Mamba).
 
 ## Features
 
@@ -57,6 +70,7 @@ The repository includes:
   - **SSL_Anti-spoofing**: Uses self-supervised learning with wav2vec 2.0 for anti-spoofing.
   - **AASIST**: Uses integrated spectro-temporal graph attention networks.
   - **SLSforASVspoof**: Uses supervised label smoothing approach for deepfake detection.
+  - **XLSR-Mamba**: Employs a dual-column bidirectional state space model with wav2vec 2.0.
 - **Custom Audio Dataset**: Supports recursive loading and pre-processing of WAV/FLAC files.
 - **Batch Inference & Continuous Saving**: Processes large datasets in batches, saving results after each inference step.
 - **Visualization Tools**: Histograms with threshold lines to help interpret detection scores.
@@ -83,29 +97,38 @@ This project builds upon the work from three repositories:
 
 1. **Build the Docker Images**
 
-   Navigate to each model's directory and build the Docker image:
+   Navigate to each model's directory (e.g., `models/ssl_antispoof`) and build the Docker image:
 
    ```bash
    # For SSL_Anti-spoofing
-   cd SSL_Anti-spoofing
+   cd models/ssl_antispoof
    docker build -t ssl-antispoof .
+   cd ../.. # Return to project root
    
    # For AASIST
-   cd AASIST
+   cd models/aasist
    docker build -t aasist .
+   cd ../.. # Return to project root
    
-   # For SLSforASVspoof
-   cd SLSforASVspoof
+   # For SLS
+   cd models/sls
    docker build -t sls-df .
+   cd ../.. # Return to project root
+
+   # For XLSR-Mamba
+   cd models/xlsr_mamba
+   docker build -t xlsr-mamba-df .
+   cd ../.. # Return to project root
    ```
 
    Alternatively, to build without changing directories, specify full paths:
    
    ```bash
    # From repository root
-   docker build -f SSL_Anti-spoofing/Dockerfile -t ssl-antispoof SSL_Anti-spoofing
-   docker build -f AASIST/Dockerfile -t aasist AASIST
-   docker build -f SLSforASVspoof/Dockerfile -t sls-df SLSforASVspoof
+   docker build -f models/ssl_antispoof/Dockerfile -t ssl-antispoof models/ssl_antispoof
+   docker build -f models/aasist/Dockerfile -t aasist models/aasist
+   docker build -f models/sls/Dockerfile -t sls-df models/sls
+   docker build -f models/xlsr_mamba/Dockerfile -t xlsr-mamba-df models/xlsr_mamba
    ```
 
 2. **Run the Container**
@@ -119,8 +142,11 @@ This project builds upon the work from three repositories:
    # For AASIST
    docker run -p 8888:8888 aasist
    
-   # For SLSforASVspoof
+   # For SLS
    docker run -p 8888:8888 sls-df
+
+   # For XLSR-Mamba
+   docker run -p 8889:8888 xlsr-mamba-df # Use a different host port if 8888 is taken
    ```
 
    **Run with GPU support (recommended for faster inference):**
@@ -132,8 +158,11 @@ This project builds upon the work from three repositories:
    # For AASIST with GPU
    docker run --gpus all -p 8888:8888 aasist
    
-   # For SLSforASVspoof with GPU
+   # For SLS with GPU
    docker run --gpus all -p 8888:8888 sls-df
+
+   # For XLSR-Mamba with GPU
+   docker run --gpus all -p 8889:8888 xlsr-mamba-df # Use a different host port
    ```
 
    Note: To use GPU acceleration, you must have the [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker) installed on your host system.
@@ -148,15 +177,19 @@ This project builds upon the work from three repositories:
    docker run --gpus all -p 8888:8888 -v /path/to/your/audio/files:/data/audio_files sls-df
    ```
 
-   Then in the notebook, use `/data/audio_files` as the input directory path.
+   For XLSR-Mamba, if you intend to use local data, ensure the cloned repository path inside the container (`/app`) is accessible for data or mount your data to a suitable path like `/data/audio_files` and adjust notebook paths accordingly:
+   ```bash
+   docker run --gpus all -p 8889:8888 -v /path/to/your/audio/files:/data/audio_files xlsr-mamba-df
+   ```
 
 ### Using the Notebooks
 
 1. Start Jupyter Lab from your Docker container (or local environment)
 2. Open one of the following notebooks:
-   - `SSL_Anti-spoofing/notebooks/SSL-inference.ipynb`  
-   - `AASIST/notebooks/AASIST-inference.ipynb`
-   - `SLSforASVspoof/notebooks/SLS-inference.ipynb`
+   - `models/ssl_antispoof/notebooks/SSL-inference.ipynb`  
+   - `models/aasist/notebooks/AASIST-inference.ipynb`
+   - `models/sls/notebooks/SLS-inference.ipynb`
+   - For XLSR-Mamba, navigate to `/app` (or the cloned repo path) within the Jupyter Lab interface to find its notebooks.
 3. Follow the notebook cells which will:
    - Generate a list of audio files (or load them from a text file).
    - Define the custom dataset and loader.
@@ -165,6 +198,22 @@ This project builds upon the work from three repositories:
    - Visualize the score distribution.
 
 **Note:** Make sure to update any file paths (e.g., where your audio files are located) in the notebook if needed.
+
+## Evaluation Tools
+
+The `deepfake_eval` directory contains Python modules such as `metrics.py` and `plotting.py` which can be used for evaluation tasks.
+
+Additionally, the `examples/evaluation/` directory contains example notebooks for evaluating specific models on the `brspeech_df` dataset:
+- `examples/evaluation/aasist_eval_on_brspeech_df.ipynb`
+- `examples/evaluation/sls_eval_on_brspeech_df.ipynb`
+- `examples/evaluation/ssl_eval_on_brspeech_df.ipynb`
+
+These notebooks demonstrate how to:
+- Load model scores and corresponding labels.
+- Calculate metrics such as EER (Equal Error Rate).
+- Visualize score distributions and error rates.
+
+Users can adapt these examples or use the modules in `deepfake_eval` to build custom evaluation pipelines for their deepfake detection models. The core evaluation logic previously found in `eval_metrics.ipynb` and `df_detection_evaluation.ipynb` can be replicated or extended using these resources.
 
 ## Citation
 
@@ -202,10 +251,22 @@ For SLSforASVspoof:
 }
 ```
 
+For XLSR-Mamba:
+```bibtex
+@article{xiao2024xlsr,
+  title={XLSR-Mamba: A Dual-Column Bidirectional State Space Model for Spoofing Attack Detection},
+  author={Xiao, Yang and Das, Rohan Kumar},
+  journal={arXiv preprint arXiv:2401.00390},
+  year={2024}
+}
+```
+(Note: The XLSR-Mamba citation has been updated with the arXiv ID. Please verify and update if a more formal publication reference becomes available.)
+
 The original implementations can be found at:  
 - SSL_Anti-spoofing: [https://github.com/TakHemlata/SSL_Anti-spoofing](https://github.com/TakHemlata/SSL_Anti-spoofing)
 - AASIST: [https://github.com/clovaai/aasist](https://github.com/clovaai/aasist)
 - SLSforASVspoof: [https://github.com/QiShanZhang/SLSforASVspoof-2021-DF](https://github.com/QiShanZhang/SLSforASVspoof-2021-DF)
+- XLSR-Mamba: [https://github.com/swagshaw/XLSR-Mamba](https://github.com/swagshaw/XLSR-Mamba)
 
 ## License
 

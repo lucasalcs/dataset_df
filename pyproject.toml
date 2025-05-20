@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepfake_eval"
+version = "0.1.0"
+authors = [
+  { name="RV", email="rvirgilli@azion.com" },
+]
+description = "A small package for evaluating deepfake detection models"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "mypy",
+    "ruff",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/r-virgilli/voice-deepfake-detection-br"
+"Bug Tracker" = "https://github.com/r-virgilli/voice-deepfake-detection-br/issues"
+
+[project.scripts]
+df-eval = "deepfake_eval.cli:main"
+
+# Use tool.setuptools table for package discovery
+[tool.setuptools.packages.find]
+where = ["."]  # look in the root directory
+include = ["deepfake_eval*"]  # Include the package
+exclude = ["tests*", "notebooks*", "scripts*", "data*", "configs*", "output*", "models*", "tts*"] # Exclude other top-level dirs 

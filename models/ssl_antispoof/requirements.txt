@@ -1,0 +1,11 @@
+# This should match the original repository's requirements
+tensorboard==2.11.2
+tqdm==4.67.1
+gdown==5.2.0
+numpy==1.22.0
+jupyterlab==3.6.8
+matplotlib==3.5.3
+markupsafe==2.0.1
+librosa==0.8.0
+soundfile==0.10.3.post1
+ipywidgets==7.7.2
